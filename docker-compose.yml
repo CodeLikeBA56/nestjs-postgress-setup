@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17
+    restart: always
+    container_name: postgres_container
+    environment:
+      - POSTGRES_USER=starway
+      - POSTGRES_PASSWORD=1786143
+      - POSTGRES_DB=project-management-db
+    
+    ports:
+      - '5432:5432'  # host-port:container-port
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  
+volumes:
+  postgres_data:
+    driver: local
