@@ -75,7 +75,7 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      return new InternalServerErrorException('Internal server error' + (error as Error).message);
+      return new InternalServerErrorException('Internal server error: ' + (error as Error).message);
     }
   }
 
@@ -88,7 +88,7 @@ export class AuthService {
       throw new UnauthorizedException('The email or password is incorrect.');
     }
 
-    const isPasswordMatched = await bcrypt.compare(user.password, password);
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatched) {
       throw new UnauthorizedException('The email or password is incorrect.');
