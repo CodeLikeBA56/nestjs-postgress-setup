@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "strict": true,
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
