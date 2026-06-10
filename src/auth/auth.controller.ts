@@ -43,7 +43,6 @@ export class AuthController {
   }
 
   @Post('logout')
-  @ApiCookieAuth()
   @ApiBearerAuth()
   @ApiOkResponse({ description: 'You have been logged out successfully' })
   async logout() {}
