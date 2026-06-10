@@ -5,6 +5,7 @@ import { RegisterUserDTO } from './dto/register.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   Injectable,
+  NotFoundException,
   ConflictException,
   UnauthorizedException,
   InternalServerErrorException,
@@ -71,6 +72,7 @@ export class AuthService {
 
       return {
         user,
+        message: 'Logged in successfully.',
         accessToken,
         refreshToken,
       };
@@ -85,7 +87,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      throw new UnauthorizedException('The email or password is incorrect.');
+      throw new NotFoundException('The email or password is incorrect.');
     }
 
     const isPasswordMatched = await bcrypt.compare(password, user.password);
