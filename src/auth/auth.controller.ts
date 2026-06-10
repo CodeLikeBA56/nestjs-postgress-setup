@@ -8,9 +8,9 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiConflictResponse,
   ApiUnauthorizedResponse,
-  ApiNotFoundResponse,
 } from '@nestjs/swagger';
 
 @ApiTags('Auth')
