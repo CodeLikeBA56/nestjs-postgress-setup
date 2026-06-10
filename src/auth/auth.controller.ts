@@ -6,7 +6,6 @@ import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
-  ApiCookieAuth,
   ApiOkResponse,
   ApiCreatedResponse,
   ApiConflictResponse,
@@ -29,7 +28,7 @@ export class AuthController {
   async register(@Body() registerUserDTO: RegisterUserDTO) {
     return this.authService.register(registerUserDTO);
   }
-  
+
   @Post('/login')
   @ApiOperation({
     summary: 'Login user',

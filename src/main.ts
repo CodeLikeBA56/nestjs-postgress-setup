@@ -15,8 +15,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Project Management Server API Documentation.')
-    .setDescription('The API documentation of project management server.')
+    .setTitle('Project Management System')
+    .setDescription('The API documentation for project management system.')
     .setVersion('1.0')
     .addTag('swagger-example')
     .build();
