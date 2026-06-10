@@ -1,8 +1,10 @@
 import { AppService } from './app.service';
+import { SkipThrottle } from '@nestjs/throttler';
 import { Controller, Get } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 
 @Controller()
+@SkipThrottle()
 @ApiExcludeController()
 export class AppController {
   constructor(private readonly appService: AppService) {}
