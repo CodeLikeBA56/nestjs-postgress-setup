@@ -1,6 +1,11 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { BadRequestException, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  InternalServerErrorException,
+} from '@nestjs/common';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
@@ -8,7 +13,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     const databaseUrl = process.env.DATABASE_URL;
 
     if (!databaseUrl) {
-      throw new BadRequestException('The Postgress database url is missing.');
+      throw new InternalServerErrorException('The Postgress database url is missing.');
     }
 
     const adapter = new PrismaPg({

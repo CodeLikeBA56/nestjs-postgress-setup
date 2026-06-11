@@ -5,16 +5,33 @@ services:
     image: postgres:17
     restart: always
     container_name: postgres_container
+
     environment:
-      - POSTGRES_USER=starway
-      - POSTGRES_PASSWORD=1786143
-      - POSTGRES_DB=project-management-db
-    
+      POSTGRES_USER: starway
+      POSTGRES_PASSWORD: 1786143
+      POSTGRES_DB: project-management-db
+
     ports:
-      - '5432:5432'  # host-port:container-port
+      - "5432:5432"
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin_container
+    restart: always
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+
+    ports:
+      - "5050:80"
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
 volumes:
   postgres_data:
-    driver: local
+  pgadmin_data:
