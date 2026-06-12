@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { AuthUser } from 'src/user/user.types';
 
 interface TokenPayload {
   id: string;
@@ -57,7 +58,15 @@ export class AuthService {
     };
   }
 
-  async login(loginUserDTO: LoginUserDTO) {
+  async login(loginUserDTO: LoginUserDTO): Promise<
+    | {
+        user: AuthUser;
+        message: string;
+        accessToken: string;
+        refreshToken: string;
+      }
+    | InternalServerErrorException
+  > {
     try {
       const user = await this.validateUser(loginUserDTO);
 
@@ -81,7 +90,7 @@ export class AuthService {
     }
   }
 
-  private async validateUser(loginUserDTO: LoginUserDTO) {
+  private async validateUser(loginUserDTO: LoginUserDTO): Promise<AuthUser> {
     const { email, password } = loginUserDTO;
 
     const user = await this.prisma.user.findUnique({ where: { email } });
