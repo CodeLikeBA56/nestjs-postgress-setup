@@ -119,9 +119,11 @@ export class AuthService {
     return await this.jwtService.signAsync(tokenPayload, { expiresIn: '7d' });
   }
 
-  private async verifyAccessToken(token: string): Promise<TokenPayload> {
+  async verifyAccessToken(token: string): Promise<TokenPayload> {
     try {
-      return await this.jwtService.verifyAsync(token);
+      return await this.jwtService.verifyAsync<TokenPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
     } catch {
       throw new UnauthorizedException('The access token is invalid');
     }
