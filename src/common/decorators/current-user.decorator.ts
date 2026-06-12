@@ -1,15 +1,8 @@
 import { AuthUser } from 'src/user/user.types';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { AuthenticatedRequest } from '@common/types/authenticated-request.interface';
-import { ExecutionContext, createParamDecorator, UnauthorizedException } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator((_: unknown, ctx: ExecutionContext): AuthUser => {
   const request = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
-
-  const user = request.user;
-
-  if (!user) {
-    throw new UnauthorizedException('It looks like your session has expired. Please log in again.');
-  }
-
-  return user;
+  return request.user;
 });
