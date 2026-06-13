@@ -1,8 +1,9 @@
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UserWhereInput } from 'prisma/src/generated/prisma/models';
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { AuthUser, UserRole } from './user.types';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import type { UserWhereInput } from 'prisma/src/generated/prisma/models';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { RegisterUserDTO } from 'src/auth/dto/register.dto';
 
 interface FindAllUsersArgs {
   role?: UserRole;
@@ -13,6 +14,18 @@ interface FindAllUsersArgs {
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async registerUser(registerUserDTO: RegisterUserDTO) {
+    const { name, email, password } = registerUserDTO;
+
+    const key = `user:${email}`;
+    const value = { name, email, password };
+
+    // await this.cacheManager.set(key, JSON.stringify(value));
+
+    return { user: value, key };
+  }
 
   async findAll(args: FindAllUsersArgs) {
     const { role, page, limit } = args;
@@ -36,6 +49,7 @@ export class UserService {
       }),
       this.prisma.user.count({ where }),
     ]);
+
     return {
       users,
       meta: {

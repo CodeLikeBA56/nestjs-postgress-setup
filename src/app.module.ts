@@ -7,11 +7,10 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 import { JwtAuthGuard } from '@common/guards/jwtAuth.guard';
-import { JwtMiddleware } from '@common/middleware/jwt.middleware';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -59,7 +58,5 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
   ],
 })
 export class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
+  // No middleware registration. JWT is handled by the global `JwtAuthGuard`.
 }

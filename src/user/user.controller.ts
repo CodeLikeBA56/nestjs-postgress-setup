@@ -1,5 +1,5 @@
 import { UserService } from './user.service';
-import { Body, Controller, Delete, Get, Param, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import {
   ApiTags,
   ApiQuery,
@@ -12,11 +12,18 @@ import {
 } from '@nestjs/swagger';
 import { UserRole } from './user.types';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { RegisterUserDTO } from 'src/auth/dto/register.dto';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('/')
+  async createUser(@Body() registerUserDTO: RegisterUserDTO) {
+    const user = await this.userService.registerUser(registerUserDTO);
+    return user;
+  }
 
   @Get('/')
   @ApiOperation({

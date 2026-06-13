@@ -58,15 +58,12 @@ export class AuthService {
     };
   }
 
-  async login(loginUserDTO: LoginUserDTO): Promise<
-    | {
-        user: AuthUser;
-        message: string;
-        accessToken: string;
-        refreshToken: string;
-      }
-    | InternalServerErrorException
-  > {
+  async login(loginUserDTO: LoginUserDTO): Promise<{
+    user: AuthUser;
+    message: string;
+    accessToken: string;
+    refreshToken: string;
+  }> {
     try {
       const user = await this.validateUser(loginUserDTO);
 
@@ -86,7 +83,7 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      return new InternalServerErrorException('Internal server error: ' + (error as Error).message);
+      throw new InternalServerErrorException('Internal server error: ' + (error as Error).message);
     }
   }
 
