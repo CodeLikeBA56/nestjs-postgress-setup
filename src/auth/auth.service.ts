@@ -47,13 +47,11 @@ export class AuthService {
         email,
         password: hashedPassword,
       },
+      omit: { password: true },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...result } = user;
-
     return {
-      user: result,
+      user,
       message: 'User registered successfully.',
     };
   }
@@ -90,7 +88,9 @@ export class AuthService {
   private async validateUser(loginUserDTO: LoginUserDTO): Promise<AuthUser> {
     const { email, password } = loginUserDTO;
 
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user) {
       throw new NotFoundException('The email or password is incorrect.');
