@@ -1,16 +1,17 @@
+import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { RedisModule } from './redis/redis.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 import { JwtAuthGuard } from '@common/guards/jwtAuth.guard';
 
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { Module } from '@nestjs/common';
         ],
       }),
     }),
+    RedisModule,
     PrismaModule,
     AuthModule,
     UserModule,
