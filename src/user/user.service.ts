@@ -42,6 +42,7 @@ export class UserService {
 
     const [users, totalCount] = await this.prisma.$transaction([
       this.prisma.user.findMany({
+        omit: { password: true },
         where,
         take,
         skip,
@@ -66,37 +67,52 @@ export class UserService {
       throw new BadRequestException('The user id is missing.');
     }
 
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      omit: { password: true },
+      where: { id },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found.');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
+    return user;
+  }
 
-    return result;
+  async searchUsersByName(query: string) {
+    if (!query.trim()) {
+      throw new BadRequestException('The search param is empty.');
+    }
+
+    const users = await this.prisma.user.findMany({
+      where: { name: { contains: query, mode: 'insensitive' } },
+      omit: { password: true },
+      take: 10,
+    });
+
+    return users;
   }
 
   async updateUserById(id: string, data: UpdateUserDTO): Promise<AuthUser> {
     if (!id.trim()) {
       throw new BadRequestException('The user id is missing.');
     }
-    console.log(id, data);
+
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('The name or password is missing.');
     }
 
-    const user = await this.prisma.user.update({ data, where: { id } });
+    const user = await this.prisma.user.update({
+      data,
+      where: { id },
+      omit: { password: true },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found.');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
-
-    return result;
+    return user;
   }
 
   async deleteUserById(id: string): Promise<{ message: string }> {
