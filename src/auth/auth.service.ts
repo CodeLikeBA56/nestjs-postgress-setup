@@ -47,26 +47,21 @@ export class AuthService {
         email,
         password: hashedPassword,
       },
+      omit: { password: true },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...result } = user;
-
     return {
-      user: result,
+      user,
       message: 'User registered successfully.',
     };
   }
 
-  async login(loginUserDTO: LoginUserDTO): Promise<
-    | {
-        user: AuthUser;
-        message: string;
-        accessToken: string;
-        refreshToken: string;
-      }
-    | InternalServerErrorException
-  > {
+  async login(loginUserDTO: LoginUserDTO): Promise<{
+    user: AuthUser;
+    message: string;
+    accessToken: string;
+    refreshToken: string;
+  }> {
     try {
       const user = await this.validateUser(loginUserDTO);
 
@@ -86,14 +81,16 @@ export class AuthService {
         refreshToken,
       };
     } catch (error) {
-      return new InternalServerErrorException('Internal server error: ' + (error as Error).message);
+      throw new InternalServerErrorException('Internal server error: ' + (error as Error).message);
     }
   }
 
   private async validateUser(loginUserDTO: LoginUserDTO): Promise<AuthUser> {
     const { email, password } = loginUserDTO;
 
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user) {
       throw new NotFoundException('The email or password is incorrect.');

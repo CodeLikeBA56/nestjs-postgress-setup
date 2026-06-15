@@ -1,13 +1,19 @@
+import type { Response } from 'express';
 import { Reflector } from '@nestjs/core';
+import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 import { IS_PUBLIC_KEY } from '@common/decorators/public-route.decorator';
 import { AuthenticatedRequest } from '@common/types/authenticated-request.interface';
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -19,14 +25,39 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const user = request.user;
+    const response = context.switchToHttp().getResponse<Response>();
 
-    if (!user) {
-      throw new UnauthorizedException(
-        'It looks like your session has expired. Please log in again.',
-      );
+    const cookies = request.cookies as Record<string, string> | undefined;
+    let token = cookies?.accessToken;
+
+    if (!token && typeof request.headers.authorization === 'string') {
+      const [type, headerToken] = request.headers.authorization.split(' ');
+      if (type === 'Bearer') {
+        token = headerToken;
+      }
     }
 
-    return true;
+    if (!token) {
+      throw new UnauthorizedException('No access token provided');
+    }
+
+    try {
+      const payload = await this.authService.verifyAccessToken(token);
+      const user = await this.userService.findUserById(payload.id);
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      request.user = user;
+      return true;
+    } catch (error: unknown) {
+      console.error('JWT guard error:', error);
+      if (cookies?.accessToken && response && !response.headersSent) {
+        response.clearCookie('accessToken');
+      }
+
+      throw new UnauthorizedException('Invalid access token');
+    }
   }
 }

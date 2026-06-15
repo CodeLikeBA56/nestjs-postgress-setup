@@ -1,22 +1,39 @@
 import { UserService } from './user.service';
-import { Body, Controller, Delete, Get, Param, Put, Query } from '@nestjs/common';
+import {
+  Get,
+  Put,
+  Post,
+  Body,
+  Query,
+  Param,
+  Delete,
+  Controller,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   ApiTags,
+  ApiParam,
   ApiQuery,
   ApiOperation,
   ApiOkResponse,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiBadRequestResponse,
-  ApiParam,
-  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { UserRole } from './user.types';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { RegisterUserDTO } from 'src/auth/dto/register.dto';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('/')
+  async createUser(@Body() registerUserDTO: RegisterUserDTO) {
+    const user = await this.userService.registerUser(registerUserDTO);
+    return user;
+  }
 
   @Get('/')
   @ApiOperation({
@@ -56,6 +73,25 @@ export class UserController {
     const users = this.userService.findAll({ role, page, limit });
 
     return users;
+  }
+
+  @Get('/search')
+  @ApiOperation({
+    summary: 'Search users by name',
+    description: 'Retrieves a list of users whose names partially match the provided search term.',
+  })
+  @ApiQuery({
+    name: 'name',
+    required: true,
+    type: String,
+    description: 'The name or substring to search for',
+  })
+  async searchByName(@Query('name') name: string) {
+    if (!name || !name.trim()) {
+      throw new BadRequestException('The search parameter "name" cannot be empty.');
+    }
+
+    return await this.userService.searchUsersByName(name.trim());
   }
 
   @Get('/:id')
